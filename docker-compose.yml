@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: atitc_portal
+      MYSQL_USER: atitc
+      MYSQL_PASSWORD: atitc_pass
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./atitc_database.sql:/docker-entrypoint-initdb.d/1_init.sql:ro
+
+  web:
+    build: .
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: atitc_portal
+      DB_USER: atitc
+      DB_PASS: atitc_pass
+      ALLOWED_ORIGIN: '*'
+    depends_on:
+      - db
+
+volumes:
+  db_data:
